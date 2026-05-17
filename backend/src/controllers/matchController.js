@@ -26,10 +26,14 @@ async function recommend(req, res) {
     if (!subject) return res.status(404).json({ message: 'Profile not found' });
 
     // Find candidates whose currentStation == subject.desiredStation and desiredStation == subject.currentStation
+    // and who match the same department, designation, and pay level.
     const candidates = await EmployeeProfile.find({
       _id: { $ne: subject._id },
       currentStation: subject.desiredStation,
-      desiredStation: subject.currentStation
+      desiredStation: subject.currentStation,
+      department: subject.department,
+      designation: subject.designation,
+      payLevel: subject.payLevel
     }).lean();
 
     const results = candidates.map((c) => {

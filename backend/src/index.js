@@ -7,6 +7,7 @@ const cors = require('cors');
 const { Server } = require('socket.io');
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
+const requestRoutes = require('./routes/requests');
 const { rateLimiter } = require('./middleware/rateLimit');
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.use(rateLimiter);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/profiles', profileRoutes);
+app.use('/api/requests', requestRoutes);
 app.use('/api/matches', require('./routes/matches'));
 
 io.on('connection', (socket) => {
@@ -43,6 +45,12 @@ async function start() {
   const mongo = process.env.MONGO_URI;
   if (!mongo) throw new Error('MONGO_URI required');
   await mongoose.connect(mongo);
+  try {
+    await require('./models/EmployeeProfile').syncIndexes();
+    console.log('EmployeeProfile indexes synced');
+  } catch (err) {
+    console.warn('Index sync warning:', err && err.message ? err.message : err);
+  }
   console.log('MongoDB connected');
   server.listen(PORT, () => console.log(`Server running on ${PORT}`));
 }

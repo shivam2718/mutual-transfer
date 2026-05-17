@@ -1,0 +1,20 @@
+export const ZONES = [
+  { zone: 'Central Railway', divisions: ['Mumbai CST', 'Pune', 'Solapur', 'Bhusawal', 'Nagpur'] },
+  { zone: 'Eastern Railway', divisions: ['Howrah', 'Sealdah', 'Asansol', 'Malda'] },
+  { zone: 'East Central Railway', divisions: ['Patna', 'Danapur', 'Dhanbad', 'Pt. DD Upadhyaya (Mugalsarai)', 'Samastipur'] },
+  { zone: 'East Coast Railway', divisions: ['Khurda Road', 'Sambalpur', 'Visakhapatnam'] },
+  { zone: 'Northern Railway', divisions: ['Delhi', 'Ambala', 'Lucknow', 'Moradabad', 'Firozpur', 'Agra'] },
+  { zone: 'North Central Railway', divisions: ['Prayagraj', 'Agra', 'Jhansi'] },
+  { zone: 'North Eastern Railway', divisions: ['Lucknow', 'Varanasi', 'Izzatnagar'] },
+  { zone: 'Northeast Frontier Railway', divisions: ['Alipurduar', 'Katihar', 'Rangia', 'Lumding', 'Tinsukia'] },
+  { zone: 'North Western Railway', divisions: ['Jaipur', 'Ajmer', 'Bikaner', 'Jodhpur'] },
+  { zone: 'Southern Railway', divisions: ['Chennai', 'Madurai', 'Palakkad', 'Salem', 'Tiruchirapalli', 'Thiruvananthapuram'] },
+  { zone: 'South Central Railway', divisions: ['Secunderabad', 'Hyderabad', 'Guntakal', 'Guntur', 'Nanded', 'Vijayawada'] },
+  { zone: 'South Eastern Railway', divisions: ['Kharagpur', 'Adra', 'Chakradharpur', 'Ranchi'] },
+  { zone: 'South East Central Railway', divisions: ['Bilaspur', 'Raipur', 'Nagpur'] },
+  { zone: 'South Western Railway', divisions: ['Hubballi', 'Bengaluru', 'Mysuru'] },
+  { zone: 'Western Railway', divisions: ['Mumbai Central', 'Vadodara', 'Ahmedabad', 'Rajkot', 'Bhavnagar', 'Ratlam'] },
+  { zone: 'West Central Railway', divisions: ['Jabalpur', 'Bhopal', 'Kota'] },
+  { zone: 'Kolkata Metro Railway', divisions: ['Kolkata'] },
+  { zone: 'South Coast Railway', divisions: ['Visakhapatnam', 'Guntakal', 'Guntur'] }
+]
