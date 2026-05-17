@@ -347,6 +347,115 @@ export default function Home({ account, loadingAccount, isAuthenticated }) {
           margin-top: 8px;
         }
 
+        html.dark .rh {
+          color: #e2e8f0;
+          background: #020617;
+        }
+
+        html.dark .rh-topbar {
+          background: linear-gradient(180deg, rgba(2, 6, 23, 0.98), rgba(2, 6, 23, 0));
+        }
+
+        html.dark .rh-hiw-btn {
+          color: #93c5fd;
+          background: #1e293b;
+          border-color: #334155;
+        }
+
+        html.dark .rh-hiw-btn:hover {
+          background: #334155;
+          border-color: #475569;
+        }
+
+        html.dark .rh-hiw-btn svg path {
+          stroke: #93c5fd;
+        }
+
+        html.dark .rh-hiw-dropdown {
+          background: #0f172a;
+          border-color: #334155;
+          box-shadow: 0 18px 48px rgba(2, 6, 23, 0.55);
+        }
+
+        html.dark .rh-dropdown-step {
+          border-bottom-color: #1e293b;
+        }
+
+        html.dark .rh-dropdown-line {
+          background: #1e3a8a;
+        }
+
+        html.dark .rh-dropdown-num,
+        html.dark .rh-dropdown-text h4 {
+          color: #e2e8f0;
+        }
+
+        html.dark .rh-dropdown-text p {
+          color: #94a3b8;
+        }
+
+        html.dark .rh-main {
+          background: #020617;
+        }
+
+        html.dark .rh-alert {
+          background: #0f172a;
+          border-left-color: #3b82f6;
+        }
+
+        html.dark .rh-alert h4,
+        html.dark .rh-alert span {
+          color: #cbd5e1;
+        }
+
+        html.dark .rh-alert a {
+          color: #93c5fd;
+        }
+
+        html.dark .rh-hero h1 {
+          color: #f8fafc;
+        }
+
+        html.dark .rh-hero p,
+        html.dark .rh-bottom p {
+          color: #cbd5e1;
+        }
+
+        html.dark .rh-cards {
+          border-color: #334155;
+        }
+
+        html.dark .rh-card {
+          background: #0f172a;
+          border-right-color: #334155;
+        }
+
+        html.dark .rh-card:hover {
+          background: #111827;
+        }
+
+        html.dark .rh-card h3 {
+          color: #f8fafc;
+        }
+
+        html.dark .rh-card p {
+          color: #cbd5e1;
+        }
+
+        html.dark .rh-card-count {
+          background: #1e293b;
+          color: #e2e8f0;
+        }
+
+        html.dark .rh-cta {
+          background: #e2e8f0;
+          color: #020617;
+        }
+
+        html.dark .rh-cta:hover {
+          background: #cbd5e1;
+        }
+
         @media (max-width: 768px) {
           .rh {
             height: auto;

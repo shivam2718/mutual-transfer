@@ -1,13 +1,29 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { API } from '../api/axios'
+import { FaMountainSun } from 'react-icons/fa6'
+import { BsFillCloudMoonFill } from 'react-icons/bs'
+import { MdOutlineDirectionsRailwayFilled } from 'react-icons/md'
 
 export default function Navigation({ isAuthenticated, account, onLogout }) {
   const location = useLocation()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [adminMenuOpen, setAdminMenuOpen] = useState(false)
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    if (typeof window === 'undefined') return false
+    const storedTheme = window.localStorage.getItem('theme')
+    if (storedTheme) return storedTheme === 'dark'
+    return window.matchMedia?.('(prefers-color-scheme: dark)').matches || false
+  })
   const [requestCount, setRequestCount] = useState(0)
   const [matchCount, setMatchCount] = useState(0)
+  const adminRef = useRef(null)
+  const accountRole = account?.user?.role
 
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDarkMode)
+    window.localStorage.setItem('theme', isDarkMode ? 'dark' : 'light')
+  }, [isDarkMode])
   useEffect(() => {
     async function loadHeaderCounts() {
       if (!isAuthenticated) {
@@ -15,26 +31,38 @@ export default function Navigation({ isAuthenticated, account, onLogout }) {
         setMatchCount(0)
         return
       }
-
       try {
         const [requestsRes, matchesRes] = await Promise.all([
           API.get('/requests'),
-          API.get('/matches')
+          API.get('/matches'),
         ])
-
         const requests = Array.isArray(requestsRes.data) ? requestsRes.data : []
         const matches = Array.isArray(matchesRes.data) ? matchesRes.data : []
-
         setRequestCount(requests.length)
         setMatchCount(matches.length)
-      } catch (_err) {
+      } catch {
         setRequestCount(0)
         setMatchCount(0)
       }
     }
-
     loadHeaderCounts()
   }, [isAuthenticated, location.pathname])
+
+  useEffect(() => {
+    setMobileMenuOpen(false)
+    setAdminMenuOpen(false)
+  }, [location.pathname])
+
+  // Close admin dropdown on outside click
+  useEffect(() => {
+    function handleClick(e) {
+      if (adminRef.current && !adminRef.current.contains(e.target)) {
+        setAdminMenuOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
 
   const isActive = (path) => location.pathname === path
 
@@ -45,60 +73,140 @@ export default function Navigation({ isAuthenticated, account, onLogout }) {
     { path: '/matches', label: 'My Matches', requireAuth: true, count: matchCount },
   ]
 
-  return (
-    <nav className="bg-white shadow-sm border-b">
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 font-bold text-lg text-blue-600">
-            <span className="text-2xl">🚂</span>
-            RailMutual
-          </Link>
+  const adminItems = [
+    { path: '/admin', label: 'Dashboard' },
+    { path: '/admin/users', label: 'Manage Users' },
+    { path: '/admin/requests', label: 'Review Requests' },
+  ]
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-6">
+  const getInitials = (name = '') =>
+    name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase()
+
+  return (
+    <nav className="bg-white border-b border-gray-200 sticky top-0 z-40 dark:bg-slate-900 dark:border-slate-800 transition-colors duration-200">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="flex items-center justify-between h-14">
+
+
+          <div className="flex items-center gap-3 min-w-0">
+            {/* Logo */}
+            <Link
+              to="/"
+              className="flex items-center gap-2 text-gray-900 font-semibold text-base tracking-tight hover:opacity-80 transition-opacity"
+            >
+              <MdOutlineDirectionsRailwayFilled className="text-xl" />
+              <span>RailMutual</span>
+            </Link>
+          </div>
+
+          {/* Desktop nav */}
+          <div className="hidden md:flex items-center gap-1">
             {navItems.map((item) => {
               if (item.requireAuth && !isAuthenticated) return null
+              const active = isActive(item.path)
               return (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`transition ${
-                    isActive(item.path)
-                      ? 'text-blue-600 font-semibold border-b-2 border-blue-600 pb-1'
-                      : 'text-gray-600 hover:text-gray-900'
+                  className={`relative flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    active
+                      ? 'bg-gray-100 text-gray-900'
+                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
                   }`}
                 >
-                  <span className="inline-flex items-center gap-2">
-                    <span>{item.label}</span>
-                    {typeof item.count === 'number' && (
-                      <span className="inline-flex min-w-[20px] h-5 px-1.5 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-semibold leading-none">
-                        {item.count}
-                      </span>
-                    )}
-                  </span>
+                  {item.label}
+                  {typeof item.count === 'number' && item.count > 0 && (
+                    <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-blue-500 text-white text-[10px] font-semibold leading-none">
+                      {item.count}
+                    </span>
+                  )}
                 </Link>
               )
             })}
+
+            <button
+              type="button"
+              onClick={() => setIsDarkMode((current) => !current)}
+              className="ml-1 inline-flex items-center justify-center w-9 h-9 rounded-lg border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors dark:bg-slate-900 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800"
+              aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {isDarkMode ? <FaMountainSun className="w-4 h-4" /> : <BsFillCloudMoonFill className="w-4 h-4" />}
+            </button>
+
+            {/* Admin dropdown */}
+            {accountRole === 'admin' && (
+              <div className="relative ml-1" ref={adminRef}>
+                <button
+                  type="button"
+                  onClick={() => setAdminMenuOpen((o) => !o)}
+                  aria-expanded={adminMenuOpen}
+                  aria-haspopup="menu"
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                    adminMenuOpen
+                      ? 'bg-purple-50 text-purple-700'
+                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-purple-500 flex-shrink-0" />
+                  Admin
+                  <svg
+                    className={`w-3 h-3 transition-transform ${adminMenuOpen ? 'rotate-180' : ''}`}
+                    viewBox="0 0 12 12"
+                    fill="none"
+                  >
+                    <path d="M2 4l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </button>
+
+                {adminMenuOpen && (
+                  <div
+                    className="absolute left-0 top-full mt-1.5 w-44 bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden z-50"
+                    role="menu"
+                  >
+                    <div className="px-3 py-2 border-b border-gray-100">
+                      <p className="text-[10px] font-semibold text-purple-500 uppercase tracking-widest">Admin panel</p>
+                    </div>
+                    {adminItems.map((item) => (
+                      <Link
+                        key={item.path}
+                        to={item.path}
+                        onClick={() => setAdminMenuOpen(false)}
+                        className={`block px-3 py-2 text-sm transition-colors ${
+                          isActive(item.path)
+                            ? 'bg-purple-50 text-purple-700 font-medium'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        }`}
+                        role="menuitem"
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* User Menu */}
-          <div className="flex items-center gap-4">
+          {/* Right side */}
+          <div className="flex items-center gap-2">
             {isAuthenticated ? (
               <>
                 <Link
                   to="/profile"
-                  className="flex items-center gap-2 px-3 py-2 rounded-full bg-blue-100 hover:bg-blue-200 transition text-sm font-medium"
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
                   title="Edit profile"
                 >
-                  <span className="text-lg">👤</span>
-                  <span className="hidden sm:inline text-xs max-w-[100px] truncate">
+                  <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-[10px] font-semibold flex-shrink-0">
+                    {getInitials(account?.user?.name)}
+                  </div>
+                  <span className="hidden sm:block text-sm font-medium text-gray-700 max-w-[100px] truncate">
                     {account?.user?.name || 'Account'}
                   </span>
                 </Link>
                 <button
                   onClick={onLogout}
-                  className="text-red-600 hover:text-red-800 font-medium text-sm"
+                  className="hidden sm:block text-sm text-gray-400 hover:text-red-500 font-medium transition-colors px-2 py-1.5 rounded-lg hover:bg-red-50"
                 >
                   Logout
                 </button>
@@ -106,52 +214,87 @@ export default function Navigation({ isAuthenticated, account, onLogout }) {
             ) : (
               <Link
                 to="/login"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 font-medium text-sm"
+                className="bg-gray-900 text-white text-sm font-medium px-4 py-1.5 rounded-lg hover:bg-gray-700 transition-colors"
               >
                 Login
               </Link>
             )}
 
-            {/* Mobile Menu Button */}
+            {/* Mobile menu toggle */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg bg-gray-100 hover:bg-gray-200"
+              onClick={() => setMobileMenuOpen((o) => !o)}
+              className="md:hidden flex flex-col gap-1 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              aria-label="Toggle menu"
             >
-              ☰
+              <span className={`block w-4 h-0.5 bg-gray-600 transition-transform origin-center ${mobileMenuOpen ? 'rotate-45 translate-y-1.5' : ''}`} />
+              <span className={`block w-4 h-0.5 bg-gray-600 transition-opacity ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+              <span className={`block w-4 h-0.5 bg-gray-600 transition-transform origin-center ${mobileMenuOpen ? '-rotate-45 -translate-y-1.5' : ''}`} />
             </button>
           </div>
         </div>
+      </div>
 
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden pb-4 border-t">
+      {/* Mobile menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-gray-100 bg-white">
+          <div className="max-w-6xl mx-auto px-4 py-3 space-y-0.5">
             {navItems.map((item) => {
               if (item.requireAuth && !isAuthenticated) return null
+              const active = isActive(item.path)
               return (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`block py-2 px-4 ${
-                    isActive(item.path)
-                      ? 'bg-blue-100 text-blue-600 font-semibold'
-                      : 'text-gray-600 hover:bg-gray-100'
+                  className={`flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                    active
+                      ? 'bg-gray-100 text-gray-900'
+                      : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
-                  <span className="inline-flex items-center gap-2">
-                    <span>{item.label}</span>
-                    {typeof item.count === 'number' && (
-                      <span className="inline-flex min-w-[20px] h-5 px-1.5 items-center justify-center rounded-full bg-blue-600 text-white text-xs font-semibold leading-none">
-                        {item.count}
-                      </span>
-                    )}
-                  </span>
+                  {item.label}
+                  {typeof item.count === 'number' && item.count > 0 && (
+                    <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-blue-500 text-white text-[10px] font-semibold">
+                      {item.count}
+                    </span>
+                  )}
                 </Link>
               )
             })}
+
+            {accountRole === 'admin' && (
+              <div className="pt-2 mt-1 border-t border-gray-100">
+                <p className="px-3 py-1.5 text-[10px] font-semibold text-purple-500 uppercase tracking-widest">Admin panel</p>
+                {adminItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`flex items-center px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+                      isActive(item.path)
+                        ? 'bg-purple-50 text-purple-700'
+                        : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                    }`}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+
+            {isAuthenticated && (
+              <div className="pt-2 mt-1 border-t border-gray-100">
+                <button
+                  onClick={() => { setMobileMenuOpen(false); onLogout() }}
+                  className="w-full text-left px-3 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </nav>
   )
 }

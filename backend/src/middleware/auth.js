@@ -1,4 +1,5 @@
 const { verifyAccess } = require('../utils/jwt');
+const User = require('../models/User');
 
 function authMiddleware(req, res, next) {
   try {
@@ -16,10 +17,18 @@ function authMiddleware(req, res, next) {
 }
 
 function authorizeRole(role) {
-  return function (req, res, next) {
+  return async function (req, res, next) {
     if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
-    if (req.user.role !== role) return res.status(403).json({ message: 'Forbidden' });
-    return next();
+
+    try {
+      const user = await User.findById(req.user.id).select('role');
+      if (!user) return res.status(401).json({ message: 'Unauthorized' });
+      if (user.role !== role) return res.status(403).json({ message: 'Forbidden' });
+      req.user.role = user.role;
+      return next();
+    } catch (err) {
+      return res.status(500).json({ message: 'Authorization failed' });
+    }
   };
 }
 

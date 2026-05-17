@@ -4,3 +4,101 @@
 
 /* basic app styles */
 html,body,#root{height:100%}
+
+html.dark,
+html.dark body,
+html.dark #root {
+	background-color: #020617;
+	color: #e2e8f0;
+}
+
+html.dark .bg-white {
+	background-color: #0f172a !important;
+}
+
+html.dark .bg-gray-50 {
+	background-color: #020617 !important;
+}
+
+html.dark .bg-gray-100 {
+	background-color: #1f2937 !important;
+}
+
+html.dark .bg-gray-200 {
+	background-color: #334155 !important;
+}
+
+html.dark .text-gray-900 {
+	color: #f8fafc !important;
+}
+
+html.dark .text-gray-700 {
+	color: #cbd5e1 !important;
+}
+
+html.dark .text-gray-600 {
+	color: #94a3b8 !important;
+}
+
+html.dark .text-gray-500 {
+	color: #94a3b8 !important;
+}
+
+html.dark .text-gray-400 {
+	color: #64748b !important;
+}
+
+html.dark .border-gray-100,
+html.dark .border-gray-200 {
+	border-color: #334155 !important;
+}
+
+html.dark .bg-blue-100 {
+	background-color: #1e3a8a !important;
+	color: #dbeafe !important;
+}
+
+html.dark .bg-purple-50 {
+	background-color: #312e81 !important;
+}
+
+html.dark .bg-orange-50 {
+	background-color: #7c2d12 !important;
+}
+
+html.dark .bg-green-50 {
+	background-color: #14532d !important;
+}
+
+html.dark .bg-red-50 {
+	background-color: #7f1d1d !important;
+}
+
+html.dark .bg-yellow-50 {
+	background-color: #713f12 !important;
+}
+
+html.dark select,
+html.dark input,
+html.dark textarea {
+	background-color: #0f172a;
+	color: #e2e8f0;
+	border-color: #334155;
+}
+
+html.dark select option {
+	background-color: #0f172a;
+	color: #e2e8f0;
+}
+
+html.dark select:disabled,
+html.dark input:disabled,
+html.dark textarea:disabled {
+	background-color: #1e293b;
+	color: #64748b;
+}
+
+html.dark ::placeholder {
+	color: #64748b;
+	opacity: 1;
+}

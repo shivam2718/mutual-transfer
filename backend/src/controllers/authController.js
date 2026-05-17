@@ -86,7 +86,8 @@ async function refreshToken(req, res) {
     const newRefresh = signRefresh({ id: payload.id });
     const newHash = await bcrypt.hash(newRefresh, 10);
     await RefreshTokenModel.create({ user: payload.id, tokenHash: newHash, ip: req.ip, replacedByToken: undefined });
-    const access = signAccess({ id: payload.id });
+    const currentUser = await User.findById(payload.id).select('role');
+    const access = signAccess({ id: payload.id, role: currentUser?.role || 'user' });
     res.cookie(COOKIE_NAME, newRefresh, cookieOptions(req));
     return res.json({ access });
   } catch (err) {

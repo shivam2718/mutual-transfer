@@ -10,7 +10,33 @@ import ProfileForm from './pages/ProfileForm'
 import SearchMatches from './pages/SearchMatches'
 import ProfileView from './pages/ProfileView'
 import RequestsPage from './pages/RequestsPage'
+import AdminDashboard from './pages/AdminDashboard'
+import AdminUserManagement from './pages/AdminUserManagement'
+import AdminRequests from './pages/AdminRequests'
 import { API, getAccess, setAccess } from './api/axios'
+
+function AdminGuard({ accountRole, loadingAccount, children }) {
+  if (loadingAccount) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center text-gray-600">
+        Loading admin area...
+      </div>
+    )
+  }
+
+  if (accountRole !== 'admin') {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="bg-white border rounded-lg shadow-sm px-6 py-5 text-center max-w-md">
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">Admin access required</h1>
+          <p className="text-gray-600">Your account does not currently have admin access.</p>
+        </div>
+      </div>
+    )
+  }
+
+  return children
+}
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAccess())
@@ -18,6 +44,7 @@ export default function App() {
   const [loadingAccount, setLoadingAccount] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
+  const accountRole = account?.user?.role
   const isPublicLoginRoute = !isAuthenticated && (location.pathname === '/' || location.pathname === '/login')
 
   useEffect(() => {
@@ -67,7 +94,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-gray-50 text-gray-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-200">
       <Navigation 
         isAuthenticated={isAuthenticated}
         account={account}
@@ -84,6 +111,31 @@ export default function App() {
           <Route path="/matches" element={<MyMatches />} />
           <Route path="/requests" element={<RequestsPage />} />
           <Route path="/oauth/callback" element={<OAuthCallback />} />
+          
+          <Route
+            path="/admin"
+            element={
+              <AdminGuard accountRole={accountRole} loadingAccount={loadingAccount}>
+                <AdminDashboard />
+              </AdminGuard>
+            }
+          />
+          <Route
+            path="/admin/users"
+            element={
+              <AdminGuard accountRole={accountRole} loadingAccount={loadingAccount}>
+                <AdminUserManagement />
+              </AdminGuard>
+            }
+          />
+          <Route
+            path="/admin/requests"
+            element={
+              <AdminGuard accountRole={accountRole} loadingAccount={loadingAccount}>
+                <AdminRequests />
+              </AdminGuard>
+            }
+          />
         </Routes>
       </main>
     </div>

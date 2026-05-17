@@ -8,6 +8,7 @@ const { Server } = require('socket.io');
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const requestRoutes = require('./routes/requests');
+const adminRoutes = require('./routes/admin');
 const { rateLimiter } = require('./middleware/rateLimit');
 
 dotenv.config();
@@ -30,6 +31,7 @@ app.use(rateLimiter);
 app.use('/api/auth', authRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/requests', requestRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/matches', require('./routes/matches'));
 
 io.on('connection', (socket) => {

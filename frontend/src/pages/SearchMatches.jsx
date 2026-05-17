@@ -291,7 +291,7 @@ export default function SearchMatches() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-8 px-4 transition-colors duration-200">
       <div className="max-w-6xl mx-auto">
         <datalist id="station-catalog">
           {stationOptions.map((station) => (
@@ -301,24 +301,24 @@ export default function SearchMatches() {
           ))}
         </datalist>
         <h1 className="text-3xl font-bold mb-2">Find Transfer Matches</h1>
-        <p className="text-gray-600 mb-8">
+        <p className="text-gray-600 dark:text-slate-400 mb-8">
           Search for employees looking for mutual transfers matching your criteria
         </p>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-          <h2 className="text-xl font-semibold mb-4">Search Filters</h2>
+        <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md dark:shadow-none border border-blue-300 dark:border-slate-800 p-6 mb-8 transition-colors duration-200">
+          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-slate-100">Search Filters</h2>
           <form onSubmit={handleSearch}>
             <div className="space-y-6 mb-6">
               {profileFieldGroups.map((group) => (
-                <div key={group.title} className="rounded-2xl border border-gray-200 p-4 bg-gray-50/70">
-                  <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-600 mb-4">
+                <div key={group.title} className="rounded-2xl border border-blue-300 dark:border-slate-800 p-4 bg-gray-50/70 dark:bg-slate-800/80 transition-colors duration-200">
+                  <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-600 dark:text-slate-300 mb-4">
                     {group.title}
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {group.fields.map((field) => (
                       <div key={field.name}>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-slate-300 mb-2">
                           {field.label}
                         </label>
                         {renderField(field)}
@@ -328,8 +328,8 @@ export default function SearchMatches() {
                 </div>
               ))}
 
-              <div className="rounded-2xl border border-blue-200 bg-gradient-to-br from-blue-50 to-sky-50 p-5">
-  <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 mb-4">
+              <div className="rounded-2xl border border-blue-200 dark:border-slate-800 bg-gradient-to-br from-blue-50 to-sky-50 dark:from-slate-900 dark:to-slate-950 p-5 transition-colors duration-200">
+  <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-300 mb-4">
     Nearby Stations Search
   </h3>
 
@@ -347,7 +347,7 @@ export default function SearchMatches() {
           disabled={!areSearchFiltersComplete}
           className="h-4 w-4 rounded border-gray-300 accent-blue-600 cursor-pointer shrink-0"
         />
-        <span className="text-sm font-medium text-slate-800">
+        <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
           Include nearby for <strong className="text-blue-600">desired</strong> station
         </span>
       </label>
@@ -362,22 +362,22 @@ export default function SearchMatches() {
           disabled={!areSearchFiltersComplete}
           className="h-4 w-4 rounded border-gray-300 accent-blue-600 cursor-pointer shrink-0"
         />
-        <span className="text-sm font-medium text-slate-800">
+        <span className="text-sm font-medium text-slate-800 dark:text-slate-200">
           Include nearby for <strong className="text-blue-600">current</strong> station
         </span>
       </label>
 
-      <p className="text-xs text-slate-500 leading-relaxed">
+      <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
         Expands search to include stations within the selected radius.
       </p>
     </div>
 
     {/* Vertical divider */}
-    <div className="self-stretch w-px bg-blue-200 hidden sm:block" />
+    <div className="self-stretch w-px bg-blue-200 dark:bg-slate-700 hidden sm:block" />
 
     {/* Radius input */}
     <div className="flex flex-col gap-1 min-w-[140px]">
-      <label className="text-xs font-semibold text-gray-700">
+      <label className="text-xs font-semibold text-gray-700 dark:text-slate-300">
         Radius (km)
       </label>
       <input
@@ -388,11 +388,11 @@ export default function SearchMatches() {
         value={filters.nearbyRadiusKm}
         onChange={handleFilterChange}
         disabled={!areSearchFiltersComplete || (!filters.includeNearbyDesiredStations && !filters.includeNearbyCurrentStations)}
-        className="w-full px-3 py-2 border border-blue-300 rounded-lg bg-white shadow-sm text-sm text-slate-800
+        className="w-full px-3 py-2 border border-blue-300 dark:border-slate-800 rounded-lg bg-white dark:bg-slate-900 shadow-sm text-sm text-slate-800 dark:text-slate-100
                    focus:outline-none focus:ring-2 focus:ring-blue-500
-                   disabled:bg-gray-100 disabled:text-gray-400 disabled:border-gray-200"
+             disabled:bg-gray-100 disabled:text-gray-400 disabled:border-slate-700"
       />
-      <span className="text-xs text-slate-400">Range: 1 – 500 km</span>
+      <span className="text-xs text-slate-400 dark:text-slate-500">Range: 1 – 500 km</span>
     </div>
 
   </div>
@@ -410,7 +410,7 @@ export default function SearchMatches() {
               <button
                 type="button"
                 onClick={handleClearFilters}
-                className="border border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 font-medium text-sm"
+                className="border border-gray-300 dark:border-slate-700 text-gray-700 dark:text-slate-200 px-6 py-2 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-800 font-medium text-sm"
               >
                 Clear Filters
               </button>
@@ -420,13 +420,13 @@ export default function SearchMatches() {
 
         {/* Results */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">
+          <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-slate-100">
             Results ({profiles.length})
           </h2>
 
           {profiles.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-md p-8 text-center">
-              <p className="text-gray-600 text-lg">
+            <div className="bg-white dark:bg-slate-900 rounded-lg shadow-md dark:shadow-none border border-gray-200 dark:border-slate-700 p-8 text-center transition-colors duration-200">
+              <p className="text-gray-600 dark:text-slate-400 text-lg">
                 {loading ? 'Loading profiles...' : 'No profiles found matching your criteria'}
               </p>
             </div>
@@ -441,19 +441,19 @@ export default function SearchMatches() {
                   return (
                 <div
                   key={profile._id}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition cursor-pointer"
+                    className="bg-white dark:bg-slate-900 rounded-lg shadow-md dark:shadow-none border border-gray-200 dark:border-slate-800 overflow-hidden hover:shadow-lg dark:hover:bg-slate-800/60 transition cursor-pointer"
                   onClick={() => navigate(`/profile/${profile._id}`)}
                 >
                   {/* Profile Header */}
-                  <div className="bg-gradient-to-r from-blue-600 to-blue-800 p-6 text-white">
+                  <div className="bg-gradient-to-r from-blue-600 to-blue-800 dark:from-slate-800 dark:to-slate-900 p-6 text-white">
                     {profile.photoUrl ? (
                       <img
                         src={profile.photoUrl}
                         alt={profile.fullName}
-                        className="w-16 h-16 rounded-full mx-auto mb-3 object-cover border-4 border-white"
+                        className="w-16 h-16 rounded-full mx-auto mb-3 object-cover border-4 border-white dark:border-slate-950"
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-full mx-auto mb-3 border-4 border-white bg-white/20 flex items-center justify-center text-2xl font-bold">
+                      <div className="w-16 h-16 rounded-full mx-auto mb-3 border-4 border-white dark:border-slate-950 bg-white/20 dark:bg-slate-800/60 flex items-center justify-center text-2xl font-bold">
                         {profile.fullName?.[0]?.toUpperCase() || '👤'}
                       </div>
                     )}
@@ -464,46 +464,46 @@ export default function SearchMatches() {
                   {/* Profile Details */}
                   <div className="p-6 space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600 text-sm">🏢 Department</span>
-                      <span className="font-medium text-gray-900 text-sm">{profile.department}</span>
+                      <span className="text-gray-600 dark:text-slate-400 text-sm">🏢 Department</span>
+                      <span className="font-medium text-gray-900 dark:text-slate-100 text-sm">{profile.department}</span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600 text-sm">📍 Current</span>
-                      <span className="font-medium text-gray-900 text-sm">
+                      <span className="text-gray-600 dark:text-slate-400 text-sm">📍 Current</span>
+                      <span className="font-medium text-gray-900 dark:text-slate-100 text-sm">
                         {profile.currentStation}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600 text-sm">🎯 Desired</span>
-                      <span className="font-medium text-gray-900 text-sm">
+                      <span className="text-gray-600 dark:text-slate-400 text-sm">🎯 Desired</span>
+                      <span className="font-medium text-gray-900 dark:text-slate-100 text-sm">
                         {profile.desiredStation}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600 text-sm">💼 Level</span>
-                      <span className="font-medium text-gray-900 text-sm">{profile.payLevel}</span>
+                      <span className="text-gray-600 dark:text-slate-400 text-sm">💼 Level</span>
+                      <span className="font-medium text-gray-900 dark:text-slate-100 text-sm">{profile.payLevel}</span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-gray-600 text-sm">🏛️ Zone</span>
-                      <span className="font-medium text-gray-900 text-sm">{profile.railwayZone}</span>
+                      <span className="text-gray-600 dark:text-slate-400 text-sm">🏛️ Zone</span>
+                      <span className="font-medium text-gray-900 dark:text-slate-100 text-sm">{profile.railwayZone}</span>
                     </div>
 
                     {status && (
                       <div className="flex items-center justify-between">
-                        <span className="text-gray-600 text-sm">📋 Request</span>
+                        <span className="text-gray-600 dark:text-slate-400 text-sm">📋 Request</span>
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-semibold ${
                             status === 'pending'
-                              ? 'bg-yellow-100 text-yellow-800'
+                              ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
                               : status === 'accepted'
-                              ? 'bg-green-100 text-green-800'
+                              ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
                               : status === 'rejected'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-gray-100 text-gray-800'
+                              ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                              : 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-slate-100'
                           }`}
                         >
                           {status.charAt(0).toUpperCase() + status.slice(1)}
@@ -512,14 +512,14 @@ export default function SearchMatches() {
                     )}
 
                     {profile.bio && (
-                      <div className="pt-2 border-t">
-                        <p className="text-gray-600 text-xs line-clamp-2">{profile.bio}</p>
+                      <div className="pt-2 border-t border-gray-200 dark:border-slate-700">
+                        <p className="text-gray-600 dark:text-slate-400 text-xs line-clamp-2">{profile.bio}</p>
                       </div>
                     )}
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="border-t p-4 flex gap-2">
+                  <div className="border-t border-gray-200 dark:border-slate-800 p-4 flex gap-2">
                     <button
                       onClick={(e) => {
                         e.stopPropagation()
@@ -541,8 +541,8 @@ export default function SearchMatches() {
                       }
                       className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
                         existingRequest && existingRequest.status !== 'rejected'
-                          ? 'border border-gray-300 text-gray-500 bg-gray-100 cursor-not-allowed'
-                          : 'border border-blue-600 text-blue-600 hover:bg-blue-50'
+                          ? 'border border-gray-300 dark:border-slate-700 text-gray-500 dark:text-slate-400 bg-gray-100 dark:bg-slate-800 cursor-not-allowed'
+                          : 'border border-blue-600 text-blue-600 hover:bg-blue-50 dark:text-blue-300 dark:border-blue-400 dark:hover:bg-slate-800'
                       }`}
                     >
                       {sendingProfileId === profile._id
