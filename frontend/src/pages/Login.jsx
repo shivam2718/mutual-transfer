@@ -271,7 +271,7 @@ export default function Login() {
             </div>
 
             <a
-              href={`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/auth/google`}
+              href={`${import.meta.env.VITE_API_URL || '/api'}/auth/google`}
               className="rm-google-btn"
             >
               <svg width="18" height="18" viewBox="0 0 24 24">

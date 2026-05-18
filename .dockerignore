@@ -1,0 +1,10 @@
+**/node_modules
+**/dist
+**/.env
+**/.env.*
+**/.git
+**/.gitignore
+**/.DS_Store
+backend/jest.config.cjs
+backend/src/**/*.test.js
+frontend/src/**/*.test.js

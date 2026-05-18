@@ -14,8 +14,6 @@ function scoreMatch(a, b) {
   return { score, matches };
 }
 
-module.exports.scoreMatch = scoreMatch;
-
 // Find mutual matches for a given profile id
 async function recommend(req, res) {
   try {
@@ -68,4 +66,4 @@ async function recommend(req, res) {
   }
 }
 
-module.exports = { recommend };
+module.exports = { scoreMatch, recommend };

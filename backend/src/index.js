@@ -1,6 +1,8 @@
 const express = require('express');
 const http = require('http');
 const dotenv = require('dotenv');
+const fs = require('fs');
+const path = require('path');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
@@ -33,6 +35,19 @@ app.use('/api/profiles', profileRoutes);
 app.use('/api/requests', requestRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/matches', require('./routes/matches'));
+
+const frontendDistPath = path.join(__dirname, '..', 'public');
+const serveFrontend = process.env.SERVE_FRONTEND !== 'false' && fs.existsSync(frontendDistPath);
+
+if (serveFrontend) {
+  app.use(express.static(frontendDistPath));
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+}
 
 io.on('connection', (socket) => {
   console.log('socket connected', socket.id);
