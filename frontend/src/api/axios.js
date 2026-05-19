@@ -1,6 +1,16 @@
 import axios from 'axios';
 
-const API = axios.create({ baseURL: import.meta.env.VITE_API_URL || '/api', withCredentials: true });
+// Normalize API base URL:
+// - In development we use the local proxy path '/api'
+// - In production, VITE_API_URL may or may not include the '/api' prefix.
+// Ensure the runtime base URL always points to the backend API root.
+let baseURL = '/api';
+if (import.meta.env.VITE_API_URL) {
+  const provided = import.meta.env.VITE_API_URL;
+  baseURL = provided.endsWith('/api') ? provided : `${provided.replace(/\/$/, '')}/api`;
+}
+
+const API = axios.create({ baseURL, withCredentials: true });
 
 // simple access token store
 function getAccess() {
