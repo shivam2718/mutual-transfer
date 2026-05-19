@@ -70,8 +70,6 @@ router.get('/', async (req, res) => {
       }
     }
     if (req.query.payLevel) query.payLevel = req.query.payLevel;
-    if (req.query.postingType) query.postingType = req.query.postingType;
-    if (req.query.runningStaffType) query.runningStaffType = req.query.runningStaffType;
     if (req.query.state) query.state = regexFilter(req.query.state);
     if (req.query.yearsOfService) query.yearsOfService = Number(req.query.yearsOfService);
     if (req.query.category) query.category = req.query.category;

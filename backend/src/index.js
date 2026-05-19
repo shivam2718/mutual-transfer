@@ -13,21 +13,46 @@ const requestRoutes = require('./routes/requests');
 const adminRoutes = require('./routes/admin');
 const { rateLimiter } = require('./middleware/rateLimit');
 
-dotenv.config();
+const baseEnvPath = path.join(__dirname, '..', '.env');
+const localEnvPath = path.join(__dirname, '..', '.env.local');
+
+dotenv.config({ path: baseEnvPath });
+if (fs.existsSync(localEnvPath)) {
+  dotenv.config({ path: localEnvPath, override: true });
+}
 
 const app = express();
 const server = http.createServer(app);
 
+const allowedOrigins = new Set(
+  [
+    process.env.FRONTEND_URL,
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174'
+  ]
+    .filter(Boolean)
+    .flatMap((origin) => String(origin).split(',').map((value) => value.trim()).filter(Boolean))
+);
+
+const corsOptions = {
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.has(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
+  credentials: true
+};
+
 const io = new Server(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    credentials: true
-  }
+  cors: corsOptions
 });
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(cors({ origin: process.env.FRONTEND_URL || true, credentials: true }));
+app.use(cors(corsOptions));
 app.use(rateLimiter);
 
 app.use('/api/auth', authRoutes);

@@ -14,7 +14,9 @@ pids
 
 # dotenv environment variables file
 .env
+.env.local
 backend/.env
+backend/.env.local
 frontend/.env
 
 # Build outputs

@@ -273,15 +273,20 @@ export default function Login() {
             <button
               onClick={async () => {
                 try {
-                  const res = await fetch(`${import.meta.env.VITE_API_URL || '/api'}/auth/google`);
+                  const base = import.meta.env.VITE_API_URL || '/api';
+                  const res = await fetch(`${base}/auth/google`);
                   const data = await res.json();
-                  if (data.url) window.open(data.url, '_blank');
+                  if (data.url) {
+                    // open a focused popup window for OAuth
+                    const w = window.open(data.url, 'oauth_window', 'width=600,height=700');
+                    if (!w) window.location.href = data.url;
+                  }
                 } catch (error) {
                   console.error('Google auth error:', error);
                 }
               }}
               className="rm-google-btn"
-              style={{ cursor: 'pointer', border: 'none', background: 'none', padding: '0' }}
+              type="button"
             >
               <svg width="18" height="18" viewBox="0 0 24 24">
                 <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -289,7 +294,7 @@ export default function Login() {
                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
               </svg>
-              Sign in with Google
+              Sign in
             </button>
 
             <div className="rm-notice">
