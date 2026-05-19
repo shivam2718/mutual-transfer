@@ -271,19 +271,10 @@ export default function Login() {
             </div>
 
             <button
-              onClick={async () => {
-                try {
-                  const base = import.meta.env.VITE_API_URL || '/api';
-                  const res = await fetch(`${base}/auth/google`);
-                  const data = await res.json();
-                  if (data.url) {
-                    // open a focused popup window for OAuth
-                    const w = window.open(data.url, 'oauth_window', 'width=600,height=700');
-                    if (!w) window.location.href = data.url;
-                  }
-                } catch (error) {
-                  console.error('Google auth error:', error);
-                }
+              onClick={() => {
+                // Perform a full browser redirect for OAuth (required).
+                const prodBase = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
+                window.location.href = `${prodBase}/auth/google`;
               }}
               className="rm-google-btn"
               type="button"
