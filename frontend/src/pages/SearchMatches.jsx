@@ -185,7 +185,7 @@ export default function SearchMatches() {
           <form onSubmit={handleSearch}>
             <div className="space-y-6 mb-6">
               {profileFieldGroups.map((group) => (
-                <div key={group.title} className="rounded-2xl border border-gray-200 p-4 bg-gray-50/70">
+                <div key={group.title} className="rounded-2xl border border-gray-200 p-4 ">
                   <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-600 mb-4">
                     {group.title}
                   </h3>
@@ -202,7 +202,7 @@ export default function SearchMatches() {
                 </div>
               ))}
 
-              <div className="rounded-2xl border border-blue-200 bg-blue-50/70 p-4">
+              <div className="rounded-2xl border border-blue-200 p-4">
                 <div className="flex flex-col gap-4">
                   <div className="space-y-3">
                     <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-600">

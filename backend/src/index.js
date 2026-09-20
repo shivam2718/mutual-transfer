@@ -6,6 +6,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const { MongoMemoryServer } = require('mongodb-memory-server');
 const { Server } = require('socket.io');
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
@@ -83,10 +84,28 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 4000;
 
+async function connectMongo() {
+  const configuredUri = process.env.MONGO_URI;
+
+  if (configuredUri) {
+    try {
+      await mongoose.connect(configuredUri);
+      console.log('MongoDB connected to configured URI');
+      return;
+    } catch (err) {
+      console.warn(`Configured MongoDB connection failed: ${err.message}. Falling back to in-memory MongoDB.`);
+    }
+  }
+
+  const memoryMongo = await MongoMemoryServer.create();
+  const mongoUri = memoryMongo.getUri();
+  process.env.MONGO_URI = mongoUri;
+  await mongoose.connect(mongoUri);
+  console.log(`Using in-memory MongoDB at ${mongoUri}`);
+}
+
 async function start() {
-  const mongo = process.env.MONGO_URI;
-  if (!mongo) throw new Error('MONGO_URI required');
-  await mongoose.connect(mongo);
+  await connectMongo();
   try {
     await require('./models/EmployeeProfile').syncIndexes();
     console.log('EmployeeProfile indexes synced');

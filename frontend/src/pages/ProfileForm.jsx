@@ -1,122 +1,212 @@
+
 import React, { useEffect, useState } from 'react'
 import { API } from '../api/axios'
 import { useNavigate } from 'react-router-dom'
 import { ZONES } from '../constants/zones'
-import { DEPARTMENTS, DEPARTMENTS_WITH_BRANCHES, DEPARTMENTS_WITH_BRANCHES_AND_DESIGNATIONS } from '../constants/departments'
-import { PAY_LEVEL_OPTIONS, POSTING_TYPE_OPTIONS, RUNNING_STAFF_OPTIONS } from '../constants/railwayMetadata'
+import {
+  DEPARTMENTS,
+  DEPARTMENTS_WITH_BRANCHES,
+  DEPARTMENTS_WITH_BRANCHES_AND_DESIGNATIONS
+} from '../constants/departments'
+import {
+  PAY_LEVEL_OPTIONS,
+  POSTING_TYPE_OPTIONS,
+  RUNNING_STAFF_OPTIONS
+} from '../constants/railwayMetadata'
+
+// Default values for every profile field
+const INITIAL_PROFILE = {
+  fullName: '',
+  employeeId: '',
+  mobile: '',
+  email: '',
+  railwayZone: '',
+  division: '',
+  department: '',
+  branch: '',
+  designation: '',
+  payLevel: '',
+  postingType: '',
+  runningStaffType: '',
+  currentStation: '',
+  desiredStation: '',
+  state: '',
+  yearsOfService: '',
+  category: '',
+  gender: '',
+  bio: '',
+  photoUrl: ''
+}
 
 export default function ProfileForm() {
   const navigate = useNavigate()
+
   const [loading, setLoading] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const [message, setMessage] = useState({ type: '', text: '' })
-  const [stationOptions, setStationOptions] = useState([])
-  const [profile, setProfile] = useState({
-    fullName: '',
-    employeeId: '',
-    mobile: '',
-    email: '',
-    railwayZone: '',
-    division: '',
-    department: '',
-    branch: '',
-    designation: '',
-    payLevel: '',
-    postingType: '',
-    runningStaffType: '',
-    currentStation: '',
-    desiredStation: '',
-    state: '',
-    yearsOfService: '',
-    category: '',
-    gender: '',
-    bio: '',
-    photoUrl: ''
+  const [message, setMessage] = useState({
+    type: '',
+    text: ''
   })
+  const [stationOptions, setStationOptions] = useState([])
+
+  const [profile, setProfile] = useState(INITIAL_PROFILE)
 
   // Load existing profile
   useEffect(() => {
     async function loadProfile() {
       try {
         const res = await API.get('/profiles/me')
-        setProfile(res.data)
+
+        // Make sure every expected field has a valid value.
+        // Missing or null API fields fall back to initial values.
+        const normalizedProfile = Object.fromEntries(
+          Object.keys(INITIAL_PROFILE).map((key) => [
+            key,
+            res.data?.[key] ?? INITIAL_PROFILE[key]
+          ])
+        )
+
+        setProfile(normalizedProfile)
         setIsEditing(true)
       } catch (err) {
         // New user, no profile yet
+        setProfile(INITIAL_PROFILE)
         setIsEditing(false)
       }
     }
+
     loadProfile()
   }, [])
 
+  // Load station options
   useEffect(() => {
     async function loadStationOptions() {
       try {
         const res = await API.get('/profiles/stations')
-        setStationOptions(Array.isArray(res.data) ? res.data : [])
+
+        setStationOptions(
+          Array.isArray(res.data) ? res.data : []
+        )
       } catch (err) {
-        console.error('Failed to fetch station catalog:', err)
+        console.error(
+          'Failed to fetch station catalog:',
+          err
+        )
       }
     }
 
     loadStationOptions()
   }, [])
 
+  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target
+
     setProfile((prev) => {
       if (name === 'railwayZone') {
-        // clear downstream fields when zone changes
-        return { ...prev, [name]: value, division: '', department: '', branch: '', designation: '' }
+        // Clear downstream fields when zone changes
+        return {
+          ...prev,
+          [name]: value,
+          division: '',
+          department: '',
+          branch: '',
+          designation: ''
+        }
       }
+
       if (name === 'division') {
-        // clear downstream fields when division changes
-        return { ...prev, [name]: value, department: '', branch: '', designation: '' }
+        // Clear downstream fields when division changes
+        return {
+          ...prev,
+          [name]: value,
+          department: '',
+          branch: '',
+          designation: ''
+        }
       }
+
       if (name === 'department') {
-        // clear downstream fields when department changes
-        return { ...prev, [name]: value, branch: '', designation: '' }
+        // Clear downstream fields when department changes
+        return {
+          ...prev,
+          [name]: value,
+          branch: '',
+          designation: ''
+        }
       }
+
       if (name === 'branch') {
-        // clear designation when branch changes
-        return { ...prev, [name]: value, designation: '' }
+        // Clear designation when branch changes
+        return {
+          ...prev,
+          [name]: value,
+          designation: ''
+        }
       }
-      return { ...prev, [name]: value }
+
+      return {
+        ...prev,
+        [name]: value
+      }
     })
   }
 
+  // Handle profile photo selection
   const handlePhotoUpload = async (e) => {
     const file = e.target.files?.[0]
-    if (!file) return
 
-    const formData = new FormData()
-    formData.append('file', file)
+    if (!file) return
 
     try {
       setLoading(true)
-      // For now, create object URL. In production, upload to Cloudinary/S3
+
+      // For now, create an object URL.
+      // In production, upload the image to Cloudinary/S3.
       const photoUrl = URL.createObjectURL(file)
-      setProfile((prev) => ({ ...prev, photoUrl }))
-      setMessage({ type: 'success', text: 'Photo uploaded' })
+
+      setProfile((prev) => ({
+        ...prev,
+        photoUrl
+      }))
+
+      setMessage({
+        type: 'success',
+        text: 'Photo uploaded'
+      })
     } catch (err) {
-      setMessage({ type: 'error', text: 'Failed to upload photo' })
+      setMessage({
+        type: 'error',
+        text: 'Failed to upload photo'
+      })
     } finally {
       setLoading(false)
     }
   }
 
+  // Submit profile
   const handleSubmit = async (e) => {
     e.preventDefault()
+
     setLoading(true)
 
     try {
       await API.post('/profiles', profile)
-      setMessage({ type: 'success', text: isEditing ? 'Profile updated successfully!' : 'Profile saved successfully!' })
+
+      setMessage({
+        type: 'success',
+        text: isEditing
+          ? 'Profile updated successfully!'
+          : 'Profile saved successfully!'
+      })
+
       setTimeout(() => navigate('/'), 2000)
     } catch (err) {
       setMessage({
         type: 'error',
-        text: err.response?.data?.message || 'Failed to save profile'
+        text:
+          err.response?.data?.message ||
+          'Failed to save profile'
       })
     } finally {
       setLoading(false)
@@ -126,23 +216,37 @@ export default function ProfileForm() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="max-w-4xl mx-auto">
+
+        {/* Station suggestions */}
         <datalist id="station-catalog">
           {stationOptions.map((station) => (
-            <option key={station.name} value={station.name}>
-              {station.state ? `${station.name} - ${station.state}` : station.name}
+            <option
+              key={station.name}
+              value={station.name}
+            >
+              {station.state
+                ? `${station.name} - ${station.state}`
+                : station.name}
             </option>
           ))}
         </datalist>
+
         <div className="bg-white rounded-lg shadow-md p-8">
+
+          {/* Page heading */}
           <h1 className="text-3xl font-bold mb-2">
-            {isEditing ? 'Edit Your Profile' : 'Complete Your Profile'}
+            {isEditing
+              ? 'Edit Your Profile'
+              : 'Complete Your Profile'}
           </h1>
+
           <p className="text-gray-600 mb-6">
             {isEditing
               ? 'Update your information to reflect any changes in your transfer preferences.'
               : 'Fill in your details to be visible to other Railway employees looking for mutual transfers.'}
           </p>
 
+          {/* Success or error message */}
           {message.text && (
             <div
               className={`mb-6 p-4 rounded-lg ${
@@ -155,9 +259,14 @@ export default function ProfileForm() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
+
             {/* Photo Upload */}
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+
               {profile.photoUrl && (
                 <img
                   src={profile.photoUrl}
@@ -165,6 +274,7 @@ export default function ProfileForm() {
                   className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
                 />
               )}
+
               <label className="block">
                 <input
                   type="file"
@@ -172,19 +282,26 @@ export default function ProfileForm() {
                   onChange={handlePhotoUpload}
                   className="hidden"
                 />
+
                 <span className="bg-blue-600 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-blue-700 inline-block">
                   Upload Photo
                 </span>
               </label>
-              <p className="text-sm text-gray-500 mt-2">JPG, PNG up to 5MB</p>
+
+              <p className="text-sm text-gray-500 mt-2">
+                JPG, PNG up to 5MB
+              </p>
             </div>
 
             {/* Personal Information */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+              {/* Full Name */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Full Name *
                 </label>
+
                 <input
                   type="text"
                   name="fullName"
@@ -196,10 +313,12 @@ export default function ProfileForm() {
                 />
               </div>
 
+              {/* Employee ID */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Employee ID *
                 </label>
+
                 <input
                   type="text"
                   name="employeeId"
@@ -211,10 +330,12 @@ export default function ProfileForm() {
                 />
               </div>
 
+              {/* Email */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Email *
                 </label>
+
                 <input
                   type="email"
                   name="email"
@@ -226,10 +347,12 @@ export default function ProfileForm() {
                 />
               </div>
 
+              {/* Mobile */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Mobile *
                 </label>
+
                 <input
                   type="tel"
                   name="mobile"
@@ -241,10 +364,12 @@ export default function ProfileForm() {
                 />
               </div>
 
+              {/* Gender */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Gender
                 </label>
+
                 <select
                   name="gender"
                   value={profile.gender}
@@ -258,10 +383,12 @@ export default function ProfileForm() {
                 </select>
               </div>
 
+              {/* Years of Service */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Years of Service
                 </label>
+
                 <input
                   type="number"
                   name="yearsOfService"
@@ -275,12 +402,18 @@ export default function ProfileForm() {
 
             {/* Railway Information */}
             <div className="border-t pt-6">
-              <h2 className="text-xl font-semibold mb-4">Railway Details</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                Railway Details
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                {/* Railway Zone */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Railway Zone *
                   </label>
+
                   <select
                     name="railwayZone"
                     value={profile.railwayZone}
@@ -310,10 +443,12 @@ export default function ProfileForm() {
                   </select>
                 </div>
 
+                {/* Division */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Division
                   </label>
+
                   <select
                     name="division"
                     value={profile.division}
@@ -321,16 +456,25 @@ export default function ProfileForm() {
                     className="w-full px-4 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                   >
                     <option value="">Select Division</option>
-                    {(ZONES.find((z) => z.zone === profile.railwayZone)?.divisions || []).map((div) => (
-                      <option key={div} value={div}>{div}</option>
+
+                    {(
+                      ZONES.find(
+                        (z) => z.zone === profile.railwayZone
+                      )?.divisions || []
+                    ).map((div) => (
+                      <option key={div} value={div}>
+                        {div}
+                      </option>
                     ))}
                   </select>
                 </div>
 
+                {/* Department */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Department *
                   </label>
+
                   <select
                     name="department"
                     value={profile.department}
@@ -340,6 +484,7 @@ export default function ProfileForm() {
                     className="w-full px-4 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
                     <option value="">Select Department</option>
+
                     {DEPARTMENTS.map((dept) => (
                       <option key={dept} value={dept}>
                         {dept}
@@ -348,10 +493,12 @@ export default function ProfileForm() {
                   </select>
                 </div>
 
+                {/* Branch / Section */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Branch/Section *
                   </label>
+
                   <select
                     name="branch"
                     value={profile.branch}
@@ -361,20 +508,30 @@ export default function ProfileForm() {
                     className="w-full px-4 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
                     <option value="">Select Branch/Section</option>
-                    {profile.department && DEPARTMENTS_WITH_BRANCHES[profile.department] && 
-                      DEPARTMENTS_WITH_BRANCHES[profile.department].map((branch) => (
-                        <option key={branch} value={branch}>
+
+                    {profile.department &&
+                      DEPARTMENTS_WITH_BRANCHES[
+                        profile.department
+                      ] &&
+                      DEPARTMENTS_WITH_BRANCHES[
+                        profile.department
+                      ].map((branch) => (
+                        <option
+                          key={branch}
+                          value={branch}
+                        >
                           {branch}
                         </option>
-                      ))
-                    }
+                      ))}
                   </select>
                 </div>
 
+                {/* Designation */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Designation *
                   </label>
+
                   <select
                     name="designation"
                     value={profile.designation}
@@ -384,19 +541,30 @@ export default function ProfileForm() {
                     className="w-full px-4 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 disabled:bg-gray-100 disabled:cursor-not-allowed"
                   >
                     <option value="">Select Designation</option>
-                    {profile.department && profile.branch &&
-                      (DEPARTMENTS_WITH_BRANCHES_AND_DESIGNATIONS[profile.department]?.[profile.branch] || []).map((designation) => (
-                        <option key={designation} value={designation}>
+
+                    {profile.department &&
+                      profile.branch &&
+                      (
+                        DEPARTMENTS_WITH_BRANCHES_AND_DESIGNATIONS[
+                          profile.department
+                        ]?.[profile.branch] || []
+                      ).map((designation) => (
+                        <option
+                          key={designation}
+                          value={designation}
+                        >
                           {designation}
                         </option>
                       ))}
                   </select>
                 </div>
 
+                {/* Pay Level */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Pay Level *
                   </label>
+
                   <select
                     name="payLevel"
                     value={profile.payLevel}
@@ -405,17 +573,22 @@ export default function ProfileForm() {
                     className="w-full px-4 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                   >
                     {PAY_LEVEL_OPTIONS.map((option) => (
-                      <option key={option.value || 'placeholder'} value={option.value}>
+                      <option
+                        key={option.value || 'placeholder'}
+                        value={option.value}
+                      >
                         {option.label}
                       </option>
                     ))}
                   </select>
                 </div>
 
+                {/* Posting Type */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Posting Type
                   </label>
+
                   <select
                     name="postingType"
                     value={profile.postingType}
@@ -423,17 +596,22 @@ export default function ProfileForm() {
                     className="w-full px-4 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                   >
                     {POSTING_TYPE_OPTIONS.map((option) => (
-                      <option key={option.value || 'placeholder'} value={option.value}>
+                      <option
+                        key={option.value || 'placeholder'}
+                        value={option.value}
+                      >
                         {option.label}
                       </option>
                     ))}
                   </select>
                 </div>
 
+                {/* Running / Non-Running Staff */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Running / Non-Running Staff
                   </label>
+
                   <select
                     name="runningStaffType"
                     value={profile.runningStaffType}
@@ -441,17 +619,22 @@ export default function ProfileForm() {
                     className="w-full px-4 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
                   >
                     {RUNNING_STAFF_OPTIONS.map((option) => (
-                      <option key={option.value || 'placeholder'} value={option.value}>
+                      <option
+                        key={option.value || 'placeholder'}
+                        value={option.value}
+                      >
                         {option.label}
                       </option>
                     ))}
                   </select>
                 </div>
 
+                {/* Category */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Category
                   </label>
+
                   <select
                     name="category"
                     value={profile.category}
@@ -466,17 +649,24 @@ export default function ProfileForm() {
                     <option value="EWS">EWS</option>
                   </select>
                 </div>
+
               </div>
             </div>
 
-            {/* Posting Information */}
+            {/* Transfer Preferences */}
             <div className="border-t pt-6">
-              <h2 className="text-xl font-semibold mb-4">Transfer Preferences</h2>
+              <h2 className="text-xl font-semibold mb-4">
+                Transfer Preferences
+              </h2>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                {/* Current Posting Station */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Current Posting Station *
                   </label>
+
                   <input
                     type="text"
                     name="currentStation"
@@ -489,10 +679,12 @@ export default function ProfileForm() {
                   />
                 </div>
 
+                {/* Desired Transfer Station */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Desired Transfer Station *
                   </label>
+
                   <input
                     type="text"
                     name="desiredStation"
@@ -505,10 +697,12 @@ export default function ProfileForm() {
                   />
                 </div>
 
+                {/* State */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     State *
                   </label>
+
                   <input
                     type="text"
                     name="state"
@@ -519,6 +713,7 @@ export default function ProfileForm() {
                     placeholder="e.g., Delhi"
                   />
                 </div>
+
               </div>
             </div>
 
@@ -528,6 +723,7 @@ export default function ProfileForm() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   About You
                 </label>
+
                 <textarea
                   name="bio"
                   value={profile.bio}
@@ -539,15 +735,21 @@ export default function ProfileForm() {
               </div>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit Buttons */}
             <div className="flex gap-4">
+
               <button
                 type="submit"
                 disabled={loading}
                 className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-medium transition"
               >
-                {loading ? 'Saving...' : isEditing ? 'Update Profile' : 'Save Profile'}
+                {loading
+                  ? 'Saving...'
+                  : isEditing
+                    ? 'Update Profile'
+                    : 'Save Profile'}
               </button>
+
               <button
                 type="button"
                 onClick={() => navigate('/')}
@@ -555,6 +757,7 @@ export default function ProfileForm() {
               >
                 Back to Home
               </button>
+
             </div>
           </form>
         </div>
