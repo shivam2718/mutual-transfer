@@ -18,7 +18,7 @@ const baseEnvPath = path.join(__dirname, '..', '.env');
 const localEnvPath = path.join(__dirname, '..', '.env.local');
 
 dotenv.config({ path: baseEnvPath });
-if (fs.existsSync(localEnvPath)) {
+if (process.env.NODE_ENV !== 'production' && fs.existsSync(localEnvPath)) {
   dotenv.config({ path: localEnvPath, override: true });
 }
 

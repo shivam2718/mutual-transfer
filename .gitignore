@@ -19,6 +19,14 @@ backend/.env
 backend/.env.local
 frontend/.env
 
+# Ignore all environment variants in every project folder
+.env*
+**/.env*
+
+# Allow safe placeholder templates
+!.env.example
+!**/.env.example
+
 # Build outputs
 dist/
 build/
