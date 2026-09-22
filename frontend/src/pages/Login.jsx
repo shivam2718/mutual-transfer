@@ -8,6 +8,13 @@ export default function Login() {
     { icon: '📋', title: 'Track Applications', desc: 'Monitor every step of your transfer request in real time.' },
   ]
 
+  const journey = [
+    { number: '01', title: 'Build your profile', desc: 'Add your railway details, current station, and preferred destination.' },
+    { number: '02', title: 'Discover a match', desc: 'Compare compatible employees by station, division, department, and preferences.' },
+    { number: '03', title: 'Start the request', desc: 'Send a clear transfer request and keep the conversation in one place.' },
+    { number: '04', title: 'Move with clarity', desc: 'Track responses and make your next move with the right information.' },
+  ]
+
   return (
     <>
       <style>{`
@@ -28,10 +35,13 @@ export default function Login() {
           background: #111;
           display: flex;
           flex-direction: column;
-          justify-content: space-between;
           padding: 40px 52px;
           position: relative;
-          overflow: hidden;
+          overflow-y: auto;
+          overflow-x: hidden;
+          height: 100dvh;
+          scrollbar-color: rgba(255,255,255,0.2) transparent;
+          scrollbar-width: thin;
         }
 
         .rm-left-logo {
@@ -61,11 +71,9 @@ export default function Login() {
         }
 
         .rm-left-hero {
-          flex: 1;
           display: flex;
           flex-direction: column;
-          justify-content: center;
-          padding: 48px 0 32px;
+          padding: 72px 0 44px;
         }
         .rm-left-tag {
           display: inline-block;
@@ -101,6 +109,51 @@ export default function Login() {
           margin-bottom: 36px;
         }
 
+        .rm-section-label {
+          color: rgba(255,255,255,0.35);
+          font-size: 10px;
+          font-weight: 600;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          margin: 42px 0 16px;
+        }
+
+        .rm-journey {
+          display: grid;
+          gap: 0;
+          border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .rm-journey-step {
+          display: grid;
+          grid-template-columns: 38px 1fr;
+          gap: 14px;
+          padding: 18px 0;
+          border-bottom: 1px solid rgba(255,255,255,0.1);
+          transition: padding-left 0.2s, background 0.2s;
+        }
+        .rm-journey-step:hover { padding-left: 8px; background: linear-gradient(90deg, rgba(255,255,255,0.05), transparent); }
+        .rm-journey-number { color: #d7a95d; font: 600 11px/1.5 'DM Sans', sans-serif; }
+        .rm-journey-step h4 { color: rgba(255,255,255,0.78); font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+        .rm-journey-step p { max-width: 320px; color: rgba(255,255,255,0.36); font-size: 11px; font-weight: 300; line-height: 1.55; }
+
+        .rm-signal-row {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px;
+          margin-top: 28px;
+        }
+        .rm-signal { padding: 13px 12px; border: 1px solid rgba(255,255,255,0.1); border-radius: 7px; background: rgba(255,255,255,0.025); }
+        .rm-signal strong { display: block; color: #fff; font: 22px/1 'DM Serif Display', serif; }
+        .rm-signal span { display: block; margin-top: 6px; color: rgba(255,255,255,0.3); font-size: 9px; line-height: 1.3; }
+
+        .rm-faqs { display: grid; gap: 8px; }
+        .rm-faq { border: 1px solid rgba(255,255,255,0.1); border-radius: 7px; background: rgba(255,255,255,0.02); }
+        .rm-faq summary { padding: 13px 14px; color: rgba(255,255,255,0.65); cursor: pointer; font-size: 11px; font-weight: 500; list-style: none; }
+        .rm-faq summary::-webkit-details-marker { display: none; }
+        .rm-faq summary::after { content: '+'; float: right; color: rgba(255,255,255,0.3); font-size: 16px; font-weight: 300; line-height: 10px; }
+        .rm-faq[open] summary::after { content: '−'; }
+        .rm-faq p { padding: 0 14px 14px; color: rgba(255,255,255,0.35); font-size: 10px; line-height: 1.6; }
+
         .rm-features {
           display: grid;
           grid-template-columns: 1fr 1fr;
@@ -124,6 +177,7 @@ export default function Login() {
           font-size: 10px;
           color: rgba(255,255,255,0.18);
           letter-spacing: 0.04em;
+          line-height: 1.6;
         }
 
         /* right panel */
@@ -217,11 +271,16 @@ export default function Login() {
         .rm-help a { color: #555; text-decoration: none; font-weight: 500; border-bottom: 1px solid #ccc; padding-bottom: 1px; }
         .rm-help a:hover { color: #111; border-color: #111; }
 
+        .rm-contact { margin-top: 12px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 12px; font-size: 11px; color: #aaa; }
+        .rm-contact a { color: #555; text-decoration: none; border-bottom: 1px solid #ccc; padding-bottom: 1px; }
+        .rm-contact a:hover { color: #111; border-color: #111; }
+
         @media (max-width: 860px) {
           .rm-login { grid-template-columns: 1fr; }
-          .rm-left { padding: 32px 28px; min-height: auto; }
+          .rm-left { padding: 32px 28px; min-height: auto; height: auto; max-height: none; }
           .rm-left-hero { padding: 32px 0 24px; }
           .rm-right { padding: 40px 28px; }
+          .rm-contact { justify-content: flex-start; }
         }
       `}</style>
 
@@ -250,10 +309,45 @@ export default function Login() {
                 </div>
               ))}
             </div>
+
+            <div className="rm-section-label">How the platform works</div>
+            <div className="rm-journey">
+              {journey.map((step) => (
+                <div className="rm-journey-step" key={step.number}>
+                  <span className="rm-journey-number">{step.number}</span>
+                  <div>
+                    <h4>{step.title}</h4>
+                    <p>{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="rm-signal-row" aria-label="Platform highlights">
+              <div className="rm-signal"><strong>01</strong><span>One focused transfer profile</span></div>
+              <div className="rm-signal"><strong>02</strong><span>Clear requests, fewer calls</span></div>
+              <div className="rm-signal"><strong>∞</strong><span>Connections beyond your division</span></div>
+            </div>
+
+            <div className="rm-section-label">Good to know</div>
+            <div className="rm-faqs">
+              <details className="rm-faq">
+                <summary>Who is RailMutual for?</summary>
+                <p>It is designed for verified Indian Railway employees looking for a practical, transparent way to explore mutual transfers.</p>
+              </details>
+              <details className="rm-faq">
+                <summary>Do I decide everything online?</summary>
+                <p>The platform helps you discover and coordinate a possible match. Official approvals and railway procedures still happen through the appropriate channels.</p>
+              </details>
+              <details className="rm-faq">
+                <summary>What should I bring to my profile?</summary>
+                <p>Your current posting, preferred station, railway details, and the kind of move you are genuinely ready to make.</p>
+              </details>
+            </div>
           </div>
 
           <div className="rm-left-footer">
-            © {new Date().getFullYear()} RailMutual · Indian Railways
+            © {new Date().getFullYear()} RailMutual · Indian Railways · amankumar13054@gmail.com · 7667005988
           </div>
         </div>
 
@@ -306,7 +400,11 @@ export default function Login() {
             </div>
 
             <div className="rm-help">
-              Having trouble? <a href="#">Contact HR Support</a>
+              Contact us: <a href="mailto:amankumar13054@gmail.com">amankumar13054@gmail.com</a>
+            </div>
+            <div className="rm-contact">
+              <span>Phone:</span>
+              <a href="tel:+917667005988">7667005988</a>
             </div>
           </div>
         </div>
