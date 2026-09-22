@@ -14,6 +14,53 @@ import AdminDashboard from './pages/AdminDashboard'
 import AdminUserManagement from './pages/AdminUserManagement'
 import AdminRequests from './pages/AdminRequests'
 import { API, getAccess, setAccess } from './api/axios'
+import BackendWakeScreen from './components/BackendWakeScreen'
+
+function getBackendHealthUrl() {
+  const configuredUrl = import.meta.env.VITE_API_URL
+  if (configuredUrl) return `${configuredUrl.replace(/\/$/, '').replace(/\/api$/, '')}/health`
+  return import.meta.env.DEV ? 'http://localhost:4000/health' : '/health'
+}
+
+function useBackendStatus() {
+  const [status, setStatus] = useState('checking')
+  const [attempt, setAttempt] = useState(0)
+
+  useEffect(() => {
+    let cancelled = false
+    let timer
+
+    async function checkBackend() {
+      if (!cancelled) setStatus('checking')
+      const controller = new AbortController()
+      const timeout = window.setTimeout(() => controller.abort(), 12000)
+      try {
+        const response = await fetch(getBackendHealthUrl(), {
+          method: 'GET',
+          cache: 'no-store',
+          signal: controller.signal
+        })
+        if (!response.ok) throw new Error('Backend is not ready')
+        if (!cancelled) setStatus('ready')
+      } catch {
+        if (!cancelled) {
+          setStatus('offline')
+          timer = window.setTimeout(checkBackend, 4000)
+        }
+      } finally {
+        window.clearTimeout(timeout)
+      }
+    }
+
+    checkBackend()
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+    }
+  }, [attempt])
+
+  return { status, retry: () => setAttempt((value) => value + 1) }
+}
 
 function AdminGuard({ accountRole, loadingAccount, children }) {
   if (loadingAccount) {
@@ -39,6 +86,7 @@ function AdminGuard({ accountRole, loadingAccount, children }) {
 }
 
 export default function App() {
+  const backend = useBackendStatus()
   const [isAuthenticated, setIsAuthenticated] = useState(!!getAccess())
   const [account, setAccount] = useState(null)
   const [loadingAccount, setLoadingAccount] = useState(false)
@@ -70,6 +118,10 @@ export default function App() {
     }
     fetchAccount()
   }, [isAuthenticated, location.pathname, location.search])
+
+  if (backend.status !== 'ready') {
+    return <BackendWakeScreen retry={backend.retry} checking={backend.status === 'checking'} />
+  }
 
   async function handleLogout() {
     try {
