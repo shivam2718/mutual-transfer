@@ -84,6 +84,20 @@ export default function Home({ account, loadingAccount, isAuthenticated }) {
           position: relative;
         }
 
+        .rh-contact {
+          margin-right: auto;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          color: #888;
+          font-size: 11px;
+          font-weight: 400;
+        }
+        .rh-contact-label { color: #555; font-weight: 600; }
+        .rh-contact a { color: #555; text-decoration: none; border-bottom: 1px solid #d4d4d0; padding-bottom: 1px; }
+        .rh-contact a:hover { color: #111; border-color: #111; }
+        .rh-contact-separator { color: #c7c7c3; }
+
         /* ── how it works button ── */
         .rh-hiw-wrap {
           position: relative;
@@ -529,12 +543,23 @@ export default function Home({ account, loadingAccount, isAuthenticated }) {
         }
 
         .rh-cta:hover { background: #333; }
+
+        @media (max-width: 640px) {
+          .rh-topbar { align-items: flex-start; flex-wrap: wrap; gap: 12px; }
+          .rh-contact { width: 100%; flex-wrap: wrap; line-height: 1.5; }
+        }
       `}</style>
 
       <div className="rh">
 
         {/* Topbar — only the how it works button lives here */}
         <div className="rh-topbar">
+          <div className="rh-contact" aria-label="Contact RailMutual">
+            <span className="rh-contact-label">Contact us</span>
+            <a href="mailto:amankumar13054@gmail.com">amankumar13054@gmail.com</a>
+            <span className="rh-contact-separator">·</span>
+            <a href="tel:+917667005988">7667005988</a>
+          </div>
           <div
             className="rh-hiw-wrap"
             onMouseEnter={() => setShowSteps(true)}
